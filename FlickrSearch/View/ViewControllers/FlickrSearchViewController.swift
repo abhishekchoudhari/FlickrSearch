@@ -20,9 +20,9 @@ class FlickrSearchViewController: UIViewController, UICollectionViewDelegate, UI
     private var bindingHelper: CollectionViewBindingHelper!
     private let searchResultsViewModel: SearchResultsViewModel
 
-    required init?(coder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
+//    required init?(coder: NSCoder) {
+//        fatalError("NSCoding not supported")
+//    }
     
     let flickrCardsInfo = getAllCardInfo()
     let nodeConstructionQueue = NSOperationQueue()

@@ -54,7 +54,7 @@ class FlickrPictureCollectionCell: UICollectionViewCell {
             operation.cancel()
         }
         
-//        containerNode?.recursiveSetPreventOrCancelDisplay(true)
+        containerNode?.recursivelySetDisplaySuspended(true)
         contentLayer?.removeFromSuperlayer()
         contentLayer = nil
         containerNode = nil
@@ -95,12 +95,12 @@ class FlickrPictureCollectionCell: UICollectionViewCell {
 //                    }
                     
                     let didCancelBlur: () -> Bool = {
-                        let isCancelled = true
+                        var isCancelled = true
                         // 1
-                        if backgroundImageNode != nil {
+                        if let strongBackgroundImageNode = backgroundImageNode {
                             // 2
                             let isCancelledClosure = {
-//                                isCancelled = strongBackgroundImageNode.
+                                isCancelled = strongBackgroundImageNode.displaySuspended
                             }
                             
                             // 3
@@ -126,8 +126,7 @@ class FlickrPictureCollectionCell: UICollectionViewCell {
                 }
                 
                 //MARK: Container Node Creation Section
-                let containerNode = ASDisplayNode()
-//                let containerNode = ASDisplayNode(layerClass: AnimatedContentsDisplayLayer.self)
+                let containerNode = ASDisplayNode()//(layerClass: AnimatedContentsDisplayLayer.self)
                 containerNode.layerBacked = true
                 containerNode.shouldRasterizeDescendants = true
                 containerNode.borderColor = UIColor(hue: 0, saturation: 0, brightness: 0.85, alpha: 0.2).CGColor
@@ -185,9 +184,9 @@ class FlickrPictureCollectionCell: UICollectionViewCell {
                         }
                         
                         // 4
-//                        if containerNode.recursiveSetPreventOrCancelDisplay {
-//                            return
-//                        }
+                        if containerNode.displaySuspended {
+                            return
+                        }
                         
                         // 5
                         //MARK: Node Layer and Wrap Up Section
