@@ -15,7 +15,7 @@ class FrameCalculator {
     }
     
     class var cardWidth: CGFloat {
-        return 100.0
+        return 150.0
     }
     
     class func frameForDescriptionText(containerBounds containerBounds: CGRect, featureImageFrame: CGRect) -> CGRect {
