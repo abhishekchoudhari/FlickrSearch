@@ -16,6 +16,7 @@ class SearchResultsItemViewModel: NSObject {
     dynamic var comments: NSNumber
     let title: String
     let url: NSURL
+    let bigURL: NSURL
     var identifier: String
     var imageDescription: String
     private let services: ViewModelServices
@@ -24,6 +25,7 @@ class SearchResultsItemViewModel: NSObject {
         self.services = services
         title = photo.title
         url = photo.url
+        bigURL = photo.bigURL
         identifier = photo.identifier
         isVisible = false
         favourites = -1

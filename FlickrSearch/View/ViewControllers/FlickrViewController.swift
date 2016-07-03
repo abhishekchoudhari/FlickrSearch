@@ -16,7 +16,6 @@ class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSe
     @IBOutlet var searchButton: UIButton!
     @IBOutlet var searchCollectionView: UICollectionView!
     @IBOutlet var loadingIndicator: UIActivityIndicatorView!
-    var selectedImage: UIImage?
     private var searchViewModel: FlickrSearchViewModel!
     private var bindingHelper: CollectionViewBindingHelper!
     
@@ -59,8 +58,8 @@ class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSe
         searchViewModel.delegate = self
     }
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath){
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrPictureCell", forIndexPath: indexPath) as! FlickrPictureCollectionCell
-        selectedImage = cell.downloadedImage
+//        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrPictureCell", forIndexPath: indexPath) as! FlickrPictureCollectionCell
+
         let searhResultItem =  bindingHelper.data[indexPath.row] as! SearchResultsItemViewModel
         performSegueWithIdentifier("presentImageDetails", sender: searhResultItem)
     }
@@ -69,7 +68,7 @@ class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSe
         if segue.identifier == "presentImageDetails" {
             if let destinationVC = segue.destinationViewController as? FlickrImageDetailsViewController {
                 destinationVC.imageObject = sender as? SearchResultsItemViewModel
-                destinationVC.backgroundImage = selectedImage
+                
             }
         }
         

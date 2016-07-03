@@ -92,13 +92,13 @@ class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDeleg
                 containerNode.borderWidth = 1
                 let featureImageNode = ASNetworkImageNode()
                 featureImageNode.layerBacked = true
-                featureImageNode.contentMode = .ScaleAspectFit
+                featureImageNode.contentMode = .ScaleAspectFill
                 featureImageNode.URL = cardInfo.url
                 featureImageNode.delegate = self
                 let titleTextNode = ASTextNode()
                 titleTextNode.layerBacked = true
                 titleTextNode.backgroundColor = UIColor.clearColor()
-                titleTextNode.attributedString = NSAttributedString.attributedStringForTitleText(cardInfo.title)
+                titleTextNode.attributedString = NSAttributedString.attributedStringForCellTitleText(cardInfo.title)
                 
                 let gradientNode = GradientNode()
                 gradientNode.opaque = false
@@ -123,15 +123,19 @@ class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDeleg
                 dispatch_async(dispatch_get_main_queue()) { [weak nodeConstructionOperation] in
                     if let strongNodeConstructionOperation = nodeConstructionOperation {
                         if strongNodeConstructionOperation.cancelled {
+                            cardInfo.isVisible = false
                             return
                         }
                         if strongSelf.nodeConstructionOperation !== strongNodeConstructionOperation {
+                            cardInfo.isVisible = false
                             return
                         }
                         if containerNode.displaySuspended {
+                            cardInfo.isVisible = false
                             return
                         }
                         //MARK: Node Layer and Wrap Up Section
+                        cardInfo.isVisible = true
                         strongSelf.contentView.layer.addSublayer(containerNode.layer)
                         containerNode.setNeedsDisplay()
                         strongSelf.contentLayer = containerNode.layer

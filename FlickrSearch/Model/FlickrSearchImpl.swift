@@ -12,7 +12,6 @@ import objectiveflickr
 
 // An implementation of the FlickrSearch protocol
 class FlickrSearchImpl : NSObject, FlickrSearch, OFFlickrAPIRequestDelegate {
-    
     //MARK: Properties
     
     private let requests: NSMutableSet
@@ -54,17 +53,14 @@ class FlickrSearchImpl : NSObject, FlickrSearch, OFFlickrAPIRequestDelegate {
     // searches Flickr for the given photo metadata, returning a signal that emits the response
     func flickrImageMetadata(photoId: String) -> RACSignal {
         
-        let favouritesSignal = signalFromAPIMethod("flickr.photos.getFavorites",
-                                                   arguments: ["photo_id": photoId]) {
-                                                    // String is not AnyObject?
-                                                    (response: NSDictionary) -> NSString in
-                                                    return response.valueForKeyPath("photo.total") as! NSString
+        let favouritesSignal = signalFromAPIMethod("flickr.photos.getFavorites",arguments: ["photo_id": photoId]) {
+            (response: NSDictionary) -> NSString in
+            return response.valueForKeyPath("photo.total") as! NSString
         }
         
-        let commentsSignal = signalFromAPIMethod("flickr.photos.getInfo",
-                                                 arguments: ["photo_id": photoId]) {
-                                                    (response: NSDictionary) -> NSString in
-                                                    return response.valueForKeyPath("photo.comments._text") as! NSString
+        let commentsSignal = signalFromAPIMethod("flickr.photos.getInfo",arguments: ["photo_id": photoId]) {
+            (response: NSDictionary) -> NSString in
+            return response.valueForKeyPath("photo.comments._text") as! NSString
         }
         
         let getInfoSignal = signalFromAPIMethod("flickr.photos.getInfo",arguments: ["photo_id": photoId]) {

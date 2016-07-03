@@ -7,10 +7,10 @@
 //
 
 import UIKit
+import SDWebImage
 
 class FlickrImageDetailsViewController: UIViewController {
     var imageObject: SearchResultsItemViewModel? = nil
-    var backgroundImage: UIImage?
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var backButton: UIButton!
@@ -21,21 +21,11 @@ class FlickrImageDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.attributedText = NSAttributedString.attributedStringForTitleText(imageObject!.title)
-        RACObserve(imageObject, keyPath: "favourites").subscribeNextAs {
-            (faves:NSNumber) -> () in
-            self.favoritesLabel.text = Int(faves) == -1 ? "" : "\(Int(faves))"
-        }
+        mainImageView.sd_setImageWithURL(imageObject!.bigURL, placeholderImage:UIImage(named:"cardPlaceHolder"))
         
-        RACObserve(imageObject, keyPath: "comments").subscribeNextAs {
-            (comments:NSNumber) -> () in
-            self.commentsLabel.text = Int(comments) == -1 ? "" : "\(comments)"
-        }
-        
-        RACObserve(imageObject, keyPath: "imageDescription").subscribeNextAs {
-            (imageDescription:String) -> () in
-            self.descriptionLabel.attributedText = NSAttributedString.attributedStringForDescriptionText(imageDescription)
-            self.descriptionLabel.hidden = false
-        }
+        self.favoritesLabel.text = Int((imageObject?.favourites)!) == -1 ? "" : "\(Int((imageObject?.favourites)!))"
+        self.commentsLabel.text = Int(imageObject!.comments) == -1 ? "" : "\(imageObject!.comments)"
+        self.descriptionLabel.attributedText = NSAttributedString.attributedStringForDescriptionText(imageObject!.imageDescription)
     }
     @IBAction func backBtnClicked(sender: AnyObject) {
         dismissViewControllerAnimated(true) { 

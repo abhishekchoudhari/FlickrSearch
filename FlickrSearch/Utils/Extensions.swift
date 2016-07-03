@@ -19,6 +19,15 @@ extension NSAttributedString {
         return NSAttributedString(string: text, attributes: titleAttributes)
     }
     
+    class func attributedStringForCellTitleText(text: String) -> NSAttributedString {
+        let titleAttributes =
+            [NSFontAttributeName: UIFont(name: "AvenirNext-Heavy", size: 14)!,
+             NSForegroundColorAttributeName: UIColor.whiteColor(),
+             NSShadowAttributeName: NSShadow.titleTextShadow(),
+             NSParagraphStyleAttributeName: NSParagraphStyle.justifiedParagraphStyle()]
+        return NSAttributedString(string: text, attributes: titleAttributes)
+    }
+    
     class func attributedStringForDescriptionText(text: String) -> NSAttributedString {
         let descriptionAttributes =
             [NSFontAttributeName: UIFont(name: "AvenirNext-Medium", size: 16)!,
