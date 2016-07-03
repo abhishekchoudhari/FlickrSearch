@@ -19,7 +19,7 @@ class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDeleg
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+        featureImageSizeOptional = CGSize(width: 150.0, height: 300.0)
         placeholderLayer = CALayer()
         placeholderLayer.contents = UIImage(named: "cardPlaceholder")!.CGImage
         placeholderLayer.contentsGravity = kCAGravityCenter
@@ -93,7 +93,7 @@ class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDeleg
                 featureImageNode.layerBacked = true
                 featureImageNode.contentMode = .ScaleAspectFit
                 featureImageNode.URL = cardInfo.url
-                
+                featureImageNode.delegate = self
                 let titleTextNode = ASTextNode()
                 titleTextNode.layerBacked = true
                 titleTextNode.backgroundColor = UIColor.clearColor()
@@ -109,9 +109,9 @@ class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDeleg
                 containerNode.addSubnode(titleTextNode)
                 
                 //MARK: Node Layout Section
-                containerNode.frame = FrameCalculator.frameForContainer(featureImageSize: CGSize(width: 150.0, height: 75.0))
+                containerNode.frame = FrameCalculator.frameForContainer(featureImageSize: CGSize(width: 150.0, height: 300.0))
                 featureImageNode.frame = FrameCalculator.frameForFeatureImage(
-                    featureImageSize: CGSize(width: 150.0, height: 75.0),
+                    featureImageSize: CGSize(width: 150.0, height: 300.0),
                     containerFrameWidth: containerNode.frame.size.width)
                 titleTextNode.frame = FrameCalculator.frameForTitleText(
                     containerBounds: containerNode.bounds,
@@ -147,7 +147,7 @@ class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDeleg
     }
     
     func imageNode(imageNode: ASNetworkImageNode, didLoadImage image: UIImage){
-        featureImageSizeOptional = image.size
+//        featureImageSizeOptional = image.size
         
     }
 }

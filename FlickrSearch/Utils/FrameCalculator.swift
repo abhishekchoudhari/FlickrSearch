@@ -10,16 +10,8 @@ import Foundation
 import UIKit
 
 class FrameCalculator {
-    class var textAreaHeight: CGFloat {
-        return 300.0
-    }
-    
     class var cardWidth: CGFloat {
         return 150.0
-    }
-    
-    class func frameForDescriptionText(containerBounds containerBounds: CGRect, featureImageFrame: CGRect) -> CGRect {
-        return CGRect(x: 24.0, y: featureImageFrame.maxY + 20.0, width: containerBounds.width - 48.0, height: textAreaHeight)
     }
     
     class func frameForTitleText(containerBounds containerBounds: CGRect, featureImageFrame: CGRect) -> CGRect {
@@ -49,7 +41,7 @@ class FrameCalculator {
     
     class func sizeThatFits(size: CGSize, withImageSize imageSize: CGSize) -> CGSize {
         let imageFrameSize = aspectSizeForWidth(size.width, originalSize: imageSize)
-        return CGSize(width: size.width, height: imageFrameSize.height + textAreaHeight)
+        return CGSize(width: size.width, height: imageFrameSize.height)
     }
     
     class func aspectSizeForWidth(width: CGFloat, originalSize: CGSize) -> CGSize {
