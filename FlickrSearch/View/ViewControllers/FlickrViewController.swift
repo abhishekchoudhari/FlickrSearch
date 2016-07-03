@@ -9,8 +9,7 @@
 import Foundation
 import UIKit
 
-class FlickrViewController: UIViewController,UICollectionViewDataSource, UICollectionViewDelegate {
-    let rainforestCardsInfo = getAllCardInfo()
+class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSearchViewModelProtocol {
     let nodeConstructionQueue = NSOperationQueue()
     
     @IBOutlet var searchTextField: UITextField!
@@ -18,47 +17,25 @@ class FlickrViewController: UIViewController,UICollectionViewDataSource, UIColle
     @IBOutlet var searchCollectionView: UICollectionView!
     @IBOutlet var loadingIndicator: UIActivityIndicatorView!
     
-    private let searchViewModel: FlickrSearchViewModel
+    private var searchViewModel: FlickrSearchViewModel!
     private var bindingHelper: CollectionViewBindingHelper!
-    private let searchResultsViewModel: SearchResultsViewModel
-    
-//    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
-//        
-//        
-//        
-//        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-//    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("NSCoding not supported")
-    }
-    
-    init(flickrSearchViewModel:FlickrSearchViewModel, searchResultsViewModel:SearchResultsViewModel) {
-        self.searchViewModel = flickrSearchViewModel
-        self.searchResultsViewModel = searchResultsViewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
     }
     
     private func bindViewModel() {
+        let viewModelServices = ViewModelServicesImpl(navigationController: navigationController!)
+        
+        searchViewModel = FlickrSearchViewModel(services: viewModelServices)
         title = searchViewModel.title
-        
         searchTextField.rac_textSignal() ~> RAC(searchViewModel, "searchText")
-        
         searchViewModel.executeSearch!.executing.not() ~> RAC(loadingIndicator, "hidden")
-        
         searchViewModel.executeSearch!.executing ~> RAC(UIApplication.sharedApplication(), "networkActivityIndicatorVisible")
-        
         searchButton.rac_command = searchViewModel.executeSearch
-        
         bindingHelper = CollectionViewBindingHelper(collectionView: searchCollectionView,
-                                               sourceSignal: RACObserve(searchViewModel, keyPath: "previousSearches"), nibName: "RecentSearchItemTableViewCell",
-                                               selectionCommand: searchViewModel.previousSearchSelected)
-        
+                                               sourceSignal: RACObserve(searchViewModel, keyPath: "searchResults"))
         searchViewModel.connectionErrors.subscribeNextAs {
             (error: NSError) -> () in
             
@@ -79,18 +56,11 @@ class FlickrViewController: UIViewController,UICollectionViewDataSource, UIColle
             self.searchTextField.resignFirstResponder()
         }
         searchViewModel.executeSearch!.executionSignals.subscribeNext(hideKeyboard)
+        searchViewModel.delegate = self
     }
     
-    func collectionView(collectionView: UICollectionView,
-                                 numberOfItemsInSection section: Int) -> Int {
-        return rainforestCardsInfo.count
+    func searchResultsFetched(results:AnyObject){
+        bindingHelper.searchResultsFestched(results)
     }
-    
-    func collectionView(collectionView: UICollectionView,
-                                 cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrPictureCell", forIndexPath: indexPath) as! FlickrPictureCollectionCell
-        let cardInfo = rainforestCardsInfo[indexPath.item]
-        cell.configureCellDisplayWithCardInfo(cardInfo, nodeConstructionQueue: nodeConstructionQueue)
-        return cell
-    }
+
 }

@@ -16,6 +16,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+//        let navigationController = application.windows[0].rootViewController as! UINavigationController
+//        let viewModelServices = ViewModelServicesImpl(navigationController: navigationController)
+//        
+//        let viewModel = FlickrSearchViewModel(services: viewModelServices)
+//        let viewController = FlickrViewController(flickrSearchViewModel: viewModel)
+//        navigationController.pushViewController(viewController, animated: false)
+        
         return true
     }
 

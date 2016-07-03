@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import AsyncDisplayKit
 
-class FlickrPictureCollectionCell: UICollectionViewCell {
+class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDelegate {
     var featureImageSizeOptional: CGSize?
     var placeholderLayer: CALayer!
     var contentLayer: CALayer?
@@ -61,22 +61,18 @@ class FlickrPictureCollectionCell: UICollectionViewCell {
     }
     
     func configureCellDisplayWithCardInfo(
-        cardInfo: FlickrCardInfo,
+        cardInfo: AnyObject,
         nodeConstructionQueue: NSOperationQueue) {
         if let oldNodeConstructionOperation = nodeConstructionOperation {
             oldNodeConstructionOperation.cancel()
         }
-        
-        //MARK: Image Size Section
-        let image = UIImage(named: cardInfo.imageName)!
-        featureImageSizeOptional = image.size
-        
-        let newNodeConstructionOperation = nodeConstructionOperationWithCardInfo(cardInfo, image: image)
+        let searhResultItem = cardInfo as! SearchResultsItemViewModel
+        let newNodeConstructionOperation = nodeConstructionOperationWithCardInfo(searhResultItem)
         nodeConstructionOperation = newNodeConstructionOperation
         nodeConstructionQueue.addOperation(newNodeConstructionOperation)
     }
     
-    func nodeConstructionOperationWithCardInfo(cardInfo: FlickrCardInfo, image: UIImage) -> NSOperation {
+    func nodeConstructionOperationWithCardInfo(cardInfo: SearchResultsItemViewModel) -> NSOperation {
         let nodeConstructionOperation = NSBlockOperation()
         nodeConstructionOperation.addExecutionBlock {
             [weak self, unowned nodeConstructionOperation] in
@@ -85,87 +81,39 @@ class FlickrPictureCollectionCell: UICollectionViewCell {
             }
             if let strongSelf = self {
                 //MARK: Node Creation Section
-                let backgroundImageNode = ASImageNode()
-                backgroundImageNode.image = image
-                backgroundImageNode.contentMode = .ScaleAspectFill
-                backgroundImageNode.layerBacked = true
-                backgroundImageNode.imageModificationBlock = { [weak backgroundImageNode] input in
-//                    if input == nil {
-//                        return input
-//                    }
-                    
-                    let didCancelBlur: () -> Bool = {
-                        var isCancelled = true
-                        // 1
-                        if let strongBackgroundImageNode = backgroundImageNode {
-                            // 2
-                            let isCancelledClosure = {
-                                isCancelled = strongBackgroundImageNode.displaySuspended
-                            }
-                            
-                            // 3
-                            if NSThread.isMainThread() {
-                                isCancelledClosure()
-                            } else {
-                                dispatch_sync(dispatch_get_main_queue(), isCancelledClosure)
-                            }
-                        }
-                        return isCancelled
-                    }
-                    
-                    if let blurredImage = input.applyBlurWithRadius(
-                        30,
-                        tintColor: UIColor(white: 0.5, alpha: 0.3),
-                        saturationDeltaFactor: 1.8,
-                        maskImage: nil,
-                        didCancel: didCancelBlur) {
-                        return blurredImage
-                    } else {
-                        return image
-                    }
-                }
+                
                 
                 //MARK: Container Node Creation Section
-                let containerNode = ASDisplayNode()//(layerClass: AnimatedContentsDisplayLayer.self)
+                let containerNode = ASDisplayNode()//(layerBlock: AnimatedContentsDisplayLayer.self)
                 containerNode.layerBacked = true
                 containerNode.shouldRasterizeDescendants = true
                 containerNode.borderColor = UIColor(hue: 0, saturation: 0, brightness: 0.85, alpha: 0.2).CGColor
                 containerNode.borderWidth = 1
-                let featureImageNode = ASImageNode()
+                let featureImageNode = ASNetworkImageNode()
                 featureImageNode.layerBacked = true
                 featureImageNode.contentMode = .ScaleAspectFit
-                featureImageNode.image = image
+                featureImageNode.URL = cardInfo.url
+                
                 let titleTextNode = ASTextNode()
                 titleTextNode.layerBacked = true
                 titleTextNode.backgroundColor = UIColor.clearColor()
-                titleTextNode.attributedString = NSAttributedString.attributedStringForTitleText(cardInfo.name)
-                let descriptionTextNode = ASTextNode()
-                descriptionTextNode.layerBacked = true
-                descriptionTextNode.backgroundColor = UIColor.clearColor()
-                descriptionTextNode.attributedString =
-                    NSAttributedString.attributedStringForDescriptionText(cardInfo.description)
+                titleTextNode.attributedString = NSAttributedString.attributedStringForTitleText(cardInfo.title)
+                
                 let gradientNode = GradientNode()
                 gradientNode.opaque = false
                 gradientNode.layerBacked = true
                 
                 //MARK: Node Hierarchy Section
-                containerNode.addSubnode(backgroundImageNode)
                 containerNode.addSubnode(featureImageNode)
                 containerNode.addSubnode(gradientNode)
                 containerNode.addSubnode(titleTextNode)
-                containerNode.addSubnode(descriptionTextNode)
                 
                 //MARK: Node Layout Section
-                containerNode.frame = FrameCalculator.frameForContainer(featureImageSize: image.size)
-                backgroundImageNode.frame = FrameCalculator.frameForBackgroundImage(
-                    containerBounds: containerNode.bounds)
+                containerNode.frame = FrameCalculator.frameForContainer(featureImageSize: CGSize(width: 150.0, height: 75.0))
                 featureImageNode.frame = FrameCalculator.frameForFeatureImage(
-                    featureImageSize: image.size,
+                    featureImageSize: CGSize(width: 150.0, height: 75.0),
                     containerFrameWidth: containerNode.frame.size.width)
                 titleTextNode.frame = FrameCalculator.frameForTitleText(
-                    containerBounds: containerNode.bounds,
-                    featureImageFrame: featureImageNode.frame)
-                descriptionTextNode.frame = FrameCalculator.frameForDescriptionText(
                     containerBounds: containerNode.bounds,
                     featureImageFrame: featureImageNode.frame)
                 gradientNode.frame = FrameCalculator.frameForGradient(
@@ -173,22 +121,15 @@ class FlickrPictureCollectionCell: UICollectionViewCell {
                 
                 dispatch_async(dispatch_get_main_queue()) { [weak nodeConstructionOperation] in
                     if let strongNodeConstructionOperation = nodeConstructionOperation {
-                        // 2
                         if strongNodeConstructionOperation.cancelled {
                             return
                         }
-                        
-                        // 3
                         if strongSelf.nodeConstructionOperation !== strongNodeConstructionOperation {
                             return
                         }
-                        
-                        // 4
                         if containerNode.displaySuspended {
                             return
                         }
-                        
-                        // 5
                         //MARK: Node Layer and Wrap Up Section
                         strongSelf.contentView.layer.addSublayer(containerNode.layer)
                         containerNode.setNeedsDisplay()
@@ -203,5 +144,10 @@ class FlickrPictureCollectionCell: UICollectionViewCell {
     
     func setParallax(value: CGFloat) {
 //        imageThumbnailView.transform = CGAffineTransformMakeTranslation(0, value)
+    }
+    
+    func imageNode(imageNode: ASNetworkImageNode, didLoadImage image: UIImage){
+        featureImageSizeOptional = image.size
+        
     }
 }
