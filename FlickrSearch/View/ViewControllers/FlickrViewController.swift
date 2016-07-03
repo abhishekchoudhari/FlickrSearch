@@ -16,10 +16,10 @@ class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSe
     @IBOutlet var searchButton: UIButton!
     @IBOutlet var searchCollectionView: UICollectionView!
     @IBOutlet var loadingIndicator: UIActivityIndicatorView!
-    
+    var selectedImage: UIImage?
     private var searchViewModel: FlickrSearchViewModel!
     private var bindingHelper: CollectionViewBindingHelper!
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
@@ -35,14 +35,14 @@ class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSe
         searchViewModel.executeSearch!.executing ~> RAC(UIApplication.sharedApplication(), "networkActivityIndicatorVisible")
         searchButton.rac_command = searchViewModel.executeSearch
         bindingHelper = CollectionViewBindingHelper(collectionView: searchCollectionView,
-                                               sourceSignal: RACObserve(searchViewModel, keyPath: "searchResults"))
+                                                    sourceSignal: RACObserve(searchViewModel, keyPath: "searchResults"))
         searchViewModel.connectionErrors.subscribeNextAs {
             (error: NSError) -> () in
             
             let alertController = UIAlertController(title: "Connection Error", message: "There was a problem reaching Flickr", preferredStyle: .Alert)
             
             let OKAction = UIAlertAction(title: "OK", style: .Default) { (action) in
-                alertController.dismissViewControllerAnimated(true, completion: { 
+                alertController.dismissViewControllerAnimated(true, completion: {
                     
                 })
             }
@@ -58,6 +58,23 @@ class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSe
         searchViewModel.executeSearch!.executionSignals.subscribeNext(hideKeyboard)
         searchViewModel.delegate = self
     }
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath){
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrPictureCell", forIndexPath: indexPath) as! FlickrPictureCollectionCell
+        selectedImage = cell.downloadedImage
+        let searhResultItem =  bindingHelper.data[indexPath.row] as! SearchResultsItemViewModel
+        performSegueWithIdentifier("presentImageDetails", sender: searhResultItem)
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "presentImageDetails" {
+            if let destinationVC = segue.destinationViewController as? FlickrImageDetailsViewController {
+                destinationVC.imageObject = sender as? SearchResultsItemViewModel
+                destinationVC.backgroundImage = selectedImage
+            }
+        }
+        
+    }
+    
     
     func searchResultsFetched(results:AnyObject){
         bindingHelper.searchResultsFestched(results)

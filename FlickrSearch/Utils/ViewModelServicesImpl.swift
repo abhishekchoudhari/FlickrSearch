@@ -11,13 +11,12 @@
 import Foundation
 
 class ViewModelServicesImpl: ViewModelServices {
-  
-  private let navigationController: UINavigationController
-  let flickrSearchService: FlickrSearch
-  
-  init(navigationController: UINavigationController) {
-    self.navigationController = navigationController
-    self.flickrSearchService = FlickrSearchImpl()
-  }
+    private let navigationController: UINavigationController
+    let flickrSearchService: FlickrSearch
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+        self.flickrSearchService = FlickrSearchImpl()
+    }
   
 }

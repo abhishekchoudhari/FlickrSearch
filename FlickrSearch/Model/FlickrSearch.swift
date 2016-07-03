@@ -12,10 +12,9 @@ import ReactiveCocoa
 
 // Provides an API for searching Flickr
 protocol FlickrSearch {
-  
-  // searches Flickr for the given string, returning a signal that emits the response
-  func flickrSearchSignal(searchString: String) -> RACSignal
-  
-  // searches Flickr for the given photo metadata, returning a signal that emits the response
-  func flickrImageMetadata(photoId: String) -> RACSignal
+    // searches Flickr for the given string, returning a signal that emits the response
+    func flickrSearchSignal(searchString: String) -> RACSignal
+    
+    // searches Flickr for the given photo metadata, returning a signal that emits the response
+    func flickrImageMetadata(photoId: String) -> RACSignal
 }

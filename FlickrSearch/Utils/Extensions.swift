@@ -12,7 +12,7 @@ import UIKit
 extension NSAttributedString {
     class func attributedStringForTitleText(text: String) -> NSAttributedString {
         let titleAttributes =
-            [NSFontAttributeName: UIFont(name: "AvenirNext-Heavy", size: 30)!,
+            [NSFontAttributeName: UIFont(name: "AvenirNext-Heavy", size: 18)!,
              NSForegroundColorAttributeName: UIColor.whiteColor(),
              NSShadowAttributeName: NSShadow.titleTextShadow(),
              NSParagraphStyleAttributeName: NSParagraphStyle.justifiedParagraphStyle()]

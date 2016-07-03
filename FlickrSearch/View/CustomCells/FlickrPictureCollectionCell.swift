@@ -16,6 +16,7 @@ class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDeleg
     var contentLayer: CALayer?
     var containerNode: ASDisplayNode?
     var nodeConstructionOperation: NSOperation?
+    var downloadedImage : UIImage?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -148,6 +149,6 @@ class FlickrPictureCollectionCell: UICollectionViewCell, ASNetworkImageNodeDeleg
     
     func imageNode(imageNode: ASNetworkImageNode, didLoadImage image: UIImage){
 //        featureImageSizeOptional = image.size
-        
+        downloadedImage = image
     }
 }

@@ -9,35 +9,39 @@
 import UIKit
 
 class FlickrImageDetailsViewController: UIViewController {
-//    let backgroundImageNode = ASImageNode()
-//    backgroundImageNode.image = image
-//    backgroundImageNode.contentMode = .ScaleAspectFill
-//    backgroundImageNode.layerBacked = true
-//    backgroundImageNode.imageModificationBlock = { [weak backgroundImageNode] input in
-//    let didCancelBlur: () -> Bool = {
-//    var isCancelled = true
-//    if let strongBackgroundImageNode = backgroundImageNode {
-//    let isCancelledClosure = {
-//    isCancelled = strongBackgroundImageNode.displaySuspended
-//    }
-//    if NSThread.isMainThread() {
-//    isCancelledClosure()
-//    } else {
-//    dispatch_sync(dispatch_get_main_queue(), isCancelledClosure)
-//    }
-//    }
-//    return isCancelled
-//    }
-//    
-//    if let blurredImage = input.applyBlurWithRadius(
-//    30,
-//    tintColor: UIColor(white: 0.5, alpha: 0.3),
-//    saturationDeltaFactor: 1.8,
-//    maskImage: nil,
-//    didCancel: didCancelBlur) {
-//    return blurredImage
-//    } else {
-//    return image
-//    }
-//    }
+    var imageObject: SearchResultsItemViewModel? = nil
+    var backgroundImage: UIImage?
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var mainImageView: UIImageView!
+    @IBOutlet weak var favoritesLabel: UILabel!
+    @IBOutlet weak var commentsLabel: UILabel!
+    @IBOutlet weak var descriptionLabel: UILabel!
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        titleLabel.attributedText = NSAttributedString.attributedStringForTitleText(imageObject!.title)
+        RACObserve(imageObject, keyPath: "favourites").subscribeNextAs {
+            (faves:NSNumber) -> () in
+            self.favoritesLabel.text = Int(faves) == -1 ? "" : "\(Int(faves))"
+        }
+        
+        RACObserve(imageObject, keyPath: "comments").subscribeNextAs {
+            (comments:NSNumber) -> () in
+            self.commentsLabel.text = Int(comments) == -1 ? "" : "\(comments)"
+        }
+        
+        RACObserve(imageObject, keyPath: "imageDescription").subscribeNextAs {
+            (imageDescription:String) -> () in
+            self.descriptionLabel.attributedText = NSAttributedString.attributedStringForDescriptionText(imageDescription)
+            self.descriptionLabel.hidden = false
+        }
+    }
+    @IBAction func backBtnClicked(sender: AnyObject) {
+        dismissViewControllerAnimated(true) { 
+            
+        }
+    }
+    
+    
 }

@@ -12,36 +12,32 @@ import ReactiveCocoa
 
 
 class CollectionViewBindingHelper: NSObject,UICollectionViewDelegate, UICollectionViewDataSource {
-  
-  //MARK: Properties
-  
-  var delegate: UICollectionViewDelegate?
-  let nodeConstructionQueue = NSOperationQueue()
-  private let collectionView: UICollectionView
-  private let selectionCommand: RACCommand?
-  private var data: [AnyObject]
-
-  //MARK: Public API
-  
-  init(collectionView: UICollectionView, sourceSignal: RACSignal, selectionCommand: RACCommand? = nil) {
-    self.collectionView = collectionView
-    self.data = []
-    self.selectionCommand = selectionCommand
+    let nodeConstructionQueue = NSOperationQueue()
+    private let collectionView: UICollectionView
+    private let selectionCommand: RACCommand?
+    var data: [AnyObject]
     
-    super.init()
+    //MARK: Public API
     
-    sourceSignal.subscribeNext {
-      (d:AnyObject!) -> () in
-        if let object = d as? [AnyObject] {
-            self.data = object
+    init(collectionView: UICollectionView, sourceSignal: RACSignal, selectionCommand: RACCommand? = nil) {
+        self.collectionView = collectionView
+        self.data = []
+        self.selectionCommand = selectionCommand
+        
+        super.init()
+        
+        sourceSignal.subscribeNext {
+            (d:AnyObject!) -> () in
+            if let object = d as? [AnyObject] {
+                self.data = object
+            }
+            
+            self.collectionView.reloadData()
         }
-      
-      self.collectionView.reloadData()
+        
+        collectionView.dataSource = self
+        //    collectionView.delegate = self
     }
-    
-    collectionView.dataSource = self
-    collectionView.delegate = self
-  }
     
     func searchResultsFestched(results:AnyObject!){
         if let object = results as? [AnyObject] {
@@ -49,10 +45,10 @@ class CollectionViewBindingHelper: NSObject,UICollectionViewDelegate, UICollecti
         }
         self.collectionView.reloadData()
     }
-  
-  //MARK: Private
+    
+    //MARK: Private
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return data.count
+        return data.count
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -61,16 +57,10 @@ class CollectionViewBindingHelper: NSObject,UICollectionViewDelegate, UICollecti
         cell.configureCellDisplayWithCardInfo(item, nodeConstructionQueue: nodeConstructionQueue)
         return cell
     }
-  
-  func collectionView(collectionView: UICollectionView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
-    if selectionCommand != nil {
-      selectionCommand?.execute(data[indexPath.row])
+    
+    func collectionView(collectionView: UICollectionView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
+        if selectionCommand != nil {
+            selectionCommand?.execute(data[indexPath.row])
+        }
     }
-  }
-  
-  func scrollViewDidScroll(scrollView: UIScrollView) {
-    if self.delegate?.respondsToSelector(#selector(UIScrollViewDelegate.scrollViewDidScroll(_:))) == true {
-      self.delegate?.scrollViewDidScroll?(scrollView);
-    }
-  }
 }
