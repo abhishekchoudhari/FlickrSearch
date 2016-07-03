@@ -11,11 +11,13 @@ import UIKit
 
 class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSearchViewModelProtocol {
     let nodeConstructionQueue = NSOperationQueue()
+    let transition = PopAnimator()
     
     @IBOutlet var searchTextField: UITextField!
     @IBOutlet var searchButton: UIButton!
     @IBOutlet var searchCollectionView: UICollectionView!
     @IBOutlet var loadingIndicator: UIActivityIndicatorView!
+    
     private var searchViewModel: FlickrSearchViewModel!
     private var bindingHelper: CollectionViewBindingHelper!
     
@@ -58,10 +60,13 @@ class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSe
         searchViewModel.delegate = self
     }
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath){
-//        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrPictureCell", forIndexPath: indexPath) as! FlickrPictureCollectionCell
-
         let searhResultItem =  bindingHelper.data[indexPath.row] as! SearchResultsItemViewModel
         performSegueWithIdentifier("presentImageDetails", sender: searhResultItem)
+        //present details view controller
+//        let destinationVC = storyboard!.instantiateViewControllerWithIdentifier("FlickrImageDetailsViewController") as! FlickrImageDetailsViewController
+//        destinationVC.imageObject = searhResultItem
+//        destinationVC.transitioningDelegate = self
+//        presentViewController(destinationVC, animated: true, completion: nil)
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -74,9 +79,27 @@ class FlickrViewController: UIViewController, UICollectionViewDelegate, FlickrSe
         
     }
     
-    
     func searchResultsFetched(results:AnyObject){
         bindingHelper.searchResultsFestched(results)
     }
 
 }
+
+//extension FlickrViewController: UIViewControllerTransitioningDelegate {
+//    func animationControllerForPresentedController(
+//        presented: UIViewController,
+//        presentingController presenting: UIViewController,
+//                             sourceController source: UIViewController) ->
+//        UIViewControllerAnimatedTransitioning? {
+//            
+//            transition.originFrame = selectedImage!.superview!.convertRect(selectedImage!.frame, toView: nil)
+//            transition.presenting = true
+//            
+//            return transition
+//    }
+//    
+//    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+//        transition.presenting = false
+//        return transition
+//    }
+//}

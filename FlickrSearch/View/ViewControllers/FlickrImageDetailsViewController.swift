@@ -9,7 +9,7 @@
 import UIKit
 import SDWebImage
 
-class FlickrImageDetailsViewController: UIViewController {
+class FlickrImageDetailsViewController: UIViewController,UIViewControllerTransitioningDelegate {
     var imageObject: SearchResultsItemViewModel? = nil
     
     @IBOutlet weak var titleLabel: UILabel!
@@ -26,7 +26,17 @@ class FlickrImageDetailsViewController: UIViewController {
         self.favoritesLabel.text = Int((imageObject?.favourites)!) == -1 ? "" : "\(Int((imageObject?.favourites)!))"
         self.commentsLabel.text = Int(imageObject!.comments) == -1 ? "" : "\(imageObject!.comments)"
         self.descriptionLabel.attributedText = NSAttributedString.attributedStringForDescriptionText(imageObject!.imageDescription)
+        
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(FlickrImageDetailsViewController.actionClose(_:))))
     }
+    
+    func actionClose(tap: UITapGestureRecognizer) {
+        dismissViewControllerAnimated(true) {
+            
+        }
+//        presentingViewController?.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
     @IBAction func backBtnClicked(sender: AnyObject) {
         dismissViewControllerAnimated(true) { 
             

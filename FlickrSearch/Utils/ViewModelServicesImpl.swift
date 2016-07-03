@@ -1,7 +1,5 @@
 //
 //  ViewModelServicesImpl.swift
-//
-//  GradientNode.swift
 //  FlickrSearch
 //
 //  Created by Abhishek's Macbook on 01/07/2016.
